@@ -28,7 +28,7 @@ public class VerifTest {
         plateau[10][9] = 'X';
 
         // On s'attend à ce que la fonction réponde TRUE (Vrai)
-        assertTrue(Verif.verifVictoire(plateau, 'X'), "5 pions horizontaux devraient gagner");
+        assertTrue(Verif.validerEtMarquer(plateau, 'X'), "5 pions horizontaux devraient gagner");
     }
 
     // --- TEST 2 : Victoire Verticale Standard ---
@@ -43,7 +43,7 @@ public class VerifTest {
         plateau[5][2] = 'O';
         plateau[6][2] = 'O';
 
-        assertTrue(Verif.verifVictoire(plateau, 'O'), "5 pions verticaux devraient gagner");
+        assertTrue(Verif.validerEtMarquer(plateau, 'O'), "5 pions verticaux devraient gagner");
     }
 
     // --- TEST 3 : Victoire Diagonale (\) ---
@@ -57,7 +57,7 @@ public class VerifTest {
         plateau[3][3] = 'X';
         plateau[4][4] = 'X';
 
-        assertTrue(Verif.verifVictoire(plateau, 'X'), "5 pions en diagonale devraient gagner");
+        assertTrue(Verif.validerEtMarquer(plateau, 'X'), "5 pions en diagonale devraient gagner");
     }
 
     // --- TEST 4 : Règle des 6 pions (Overline) ---
@@ -72,10 +72,10 @@ public class VerifTest {
         plateau[10][7] = 'X';
         plateau[10][8] = 'X';
         plateau[10][9] = 'X';
-        plateau[10][10] = 'X'; // Le 6ème pion
+        plateau[10][10] = 'X';
 
         // On s'attend à ce que la fonction réponde FALSE (Faux)
-        assertFalse(Verif.verifVictoire(plateau, 'X'), "6 pions alignés ne doivent PAS donner la victoire");
+        assertFalse(Verif.validerEtMarquer(plateau, 'X'), "6 pions alignés ne doivent PAS donner la victoire");
     }
 
     // --- TEST 5 : Pas assez de pions (4 pions) ---
@@ -87,9 +87,8 @@ public class VerifTest {
         plateau[5][6] = 'O';
         plateau[5][7] = 'O';
         plateau[5][8] = 'O';
-        // Pas de 5ème pion
 
-        assertFalse(Verif.verifVictoire(plateau, 'O'), "4 pions ne doivent pas suffire");
+        assertFalse(Verif.validerEtMarquer(plateau, 'O'), "4 pions ne doivent pas suffire");
     }
 
     // --- TEST 6 : Ligne coupée (XX O XX) ---
@@ -103,6 +102,6 @@ public class VerifTest {
         plateau[5][8] = 'X';
         plateau[5][9] = 'X';
 
-        assertFalse(Verif.verifVictoire(plateau, 'X'), "Une ligne coupée par l'adversaire ne doit pas gagner");
+        assertFalse(Verif.validerEtMarquer(plateau, 'X'), "Une ligne coupée par l'adversaire ne doit pas gagner");
     }
 }

@@ -8,10 +8,10 @@ public class Player {
         boolean coupValide = false;
 
         do {
-            System.out.println("Joueur " + player + ", entrez une ligne (1-19) : ");
+            System.out.print("Joueur " + player + ", entrez une ligne (1-19) : ");
             ligne = scanner.nextInt();
 
-            System.out.println("Joueur " + player + ", entrez une colonne (1-19) : ");
+            System.out.print("\nJoueur " + player + ", entrez une colonne (1-19) : ");
             colone = scanner.nextInt();
 
             int l = ligne - 1;
