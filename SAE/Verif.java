@@ -1,117 +1,83 @@
 public class Verif {
 
-    private static boolean estMemeJoueur(char caseDuTableau, char joueur) {
-        return Character.toUpperCase(caseDuTableau) == Character.toUpperCase(joueur);
+    private static boolean estMemeJoueur(char[][] tab, int l, int c, char joueur) {
+        // verif si c'est dans tableau
+        if (l < 0 || l >= tab.length || c < 0 || c >= tab.length) {
+            return false;
+        }
+        return Character.toUpperCase(tab[l][c]) == Character.toUpperCase(joueur);
     }
 
-    // verif si la ligne contient au moins un nouveau
-    private static boolean contientNouveauPion(char p1, char p2, char p3, char p4, char p5) {
-        return Character.isUpperCase(p1) || Character.isUpperCase(p2) ||
-                Character.isUpperCase(p3) || Character.isUpperCase(p4) || Character.isUpperCase(p5);
+    private static boolean traiterVictoire(char[][] tab, int lDepart, int cDepart, int dL, int dC) {
+        // verif s'il y a au moins un pion (en majuscule) dans les 5
+        boolean nouveauPionTrouve = false;
+        for (int k = 0; k < 5; k++) {
+            if (Character.isUpperCase(tab[lDepart + k * dL][cDepart + k * dC])) {
+                nouveauPionTrouve = true;
+            }
+        }
+
+        // si oui on transforme tout en minuscule et on valide la victoire
+        if (nouveauPionTrouve) {
+            for (int k = 0; k < 5; k++) {
+                int l = lDepart + k * dL;
+                int c = cDepart + k * dC;
+                tab[l][c] = Character.toLowerCase(tab[l][c]);
+            }
+            return true;
+        }
+        return false;
     }
 
-    public static boolean validerEtMarquer(char[][] tableau, char joueur) {
-        int taille = tableau.length;
+    public static boolean validerEtMarquer(char[][] tab, char joueur, int lastL, int lastC) {
+        // Directions : {dLig, dCol} -> Horizontal, Vertical, Diag \, Diag /
+        int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
 
-        for (int i = 0; i < taille; i++) {
-            for (int j = 0; j < taille; j++) {
+        for (int[] dir : directions) {
+            int dL = dir[0];
+            int dC = dir[1];
 
-                // verif si la case de départ est au joueur (X ou x)
-                if (estMemeJoueur(tableau[i][j], joueur)) {
+            // compte combien de pions on a "avant" le dernier coup
+            int compteAvant = 0;
+            int tempL = lastL - dL;
+            int tempC = lastC - dC;
+            while (estMemeJoueur(tab, tempL, tempC, joueur)) {
+                compteAvant++;
+                tempL -= dL;
+                tempC -= dC;
+            }
 
-                    // hori
-                    if (j + 4 < taille) {
-                        if (estMemeJoueur(tableau[i][j+1], joueur) &&
-                                estMemeJoueur(tableau[i][j+2], joueur) &&
-                                estMemeJoueur(tableau[i][j+3], joueur) &&
-                                estMemeJoueur(tableau[i][j+4], joueur)) {
+            // compte combien de pions on a "après" le dernier coup
+            int compteApres = 0;
+            tempL = lastL + dL;
+            tempC = lastC + dC;
+            while (estMemeJoueur(tab, tempL, tempC, joueur)) {
+                compteApres++;
+                tempL += dL;
+                tempC += dC;
+            }
 
-                            // verif exactement 5
-                            boolean pasDePionAvant = (j == 0) || !estMemeJoueur(tableau[i][j-1], joueur);
-                            boolean pasDePionApres = (j + 5 >= taille) || !estMemeJoueur(tableau[i][j+5], joueur);
+            // total (avant + après + le pion qu'on vient de poser)
+            int total = compteAvant + compteApres + 1;
 
-                            if (pasDePionAvant && pasDePionApres) {
-                                // nouvelle victoire ?
-                                if (contientNouveauPion(tableau[i][j], tableau[i][j+1], tableau[i][j+2], tableau[i][j+3], tableau[i][j+4])) {
-                                    // si oui on transforme tout en minuscule et on renvoie true
-                                    tableau[i][j] = Character.toLowerCase(tableau[i][j]);
-                                    tableau[i][j+1] = Character.toLowerCase(tableau[i][j+1]);
-                                    tableau[i][j+2] = Character.toLowerCase(tableau[i][j+2]);
-                                    tableau[i][j+3] = Character.toLowerCase(tableau[i][j+3]);
-                                    tableau[i][j+4] = Character.toLowerCase(tableau[i][j+4]);
-                                    return true;
-                                }
-                            }
-                        }
-                    }
+            // verif EXACTEMENT 5
+            if (total == 5) {
+                // verif les bornes (qu'il n'y ait pas un 6ème pion avant ou après qui invaliderait)
+                int lAvant = lastL - (compteAvant + 1) * dL;
+                int cAvant = lastC - (compteAvant + 1) * dC;
+                int lApres = lastL + (compteApres + 1) * dL;
+                int cApres = lastC + (compteApres + 1) * dC;
 
-                    // verti
-                    if (i + 4 < taille) {
-                        if (estMemeJoueur(tableau[i+1][j], joueur) &&
-                                estMemeJoueur(tableau[i+2][j], joueur) &&
-                                estMemeJoueur(tableau[i+3][j], joueur) &&
-                                estMemeJoueur(tableau[i+4][j], joueur)) {
+                boolean pasDePionAvant = !estMemeJoueur(tab, lAvant, cAvant, joueur);
+                boolean pasDePionApres = !estMemeJoueur(tab, lApres, cApres, joueur);
 
-                            boolean pasDePionAvant = (i == 0) || !estMemeJoueur(tableau[i-1][j], joueur);
-                            boolean pasDePionApres = (i + 5 >= taille) || !estMemeJoueur(tableau[i+5][j], joueur);
+                if (pasDePionAvant && pasDePionApres) {
+                    // on calcule le point de départ de la ligne pour la colorier
+                    int startL = lastL - (compteAvant * dL);
+                    int startC = lastC - (compteAvant * dC);
 
-                            if (pasDePionAvant && pasDePionApres) {
-                                if (contientNouveauPion(tableau[i][j], tableau[i+1][j], tableau[i+2][j], tableau[i+3][j], tableau[i+4][j])) {
-                                    tableau[i][j] = Character.toLowerCase(tableau[i][j]);
-                                    tableau[i+1][j] = Character.toLowerCase(tableau[i+1][j]);
-                                    tableau[i+2][j] = Character.toLowerCase(tableau[i+2][j]);
-                                    tableau[i+3][j] = Character.toLowerCase(tableau[i+3][j]);
-                                    tableau[i+4][j] = Character.toLowerCase(tableau[i+4][j]);
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-
-                    // diag desc (\)
-                    if (i + 4 < taille && j + 4 < taille) {
-                        if (estMemeJoueur(tableau[i+1][j+1], joueur) &&
-                                estMemeJoueur(tableau[i+2][j+2], joueur) &&
-                                estMemeJoueur(tableau[i+3][j+3], joueur) &&
-                                estMemeJoueur(tableau[i+4][j+4], joueur)) {
-
-                            boolean pasDePionAvant = (i == 0 || j == 0) || !estMemeJoueur(tableau[i-1][j-1], joueur);
-                            boolean pasDePionApres = (i + 5 >= taille || j + 5 >= taille) || !estMemeJoueur(tableau[i+5][j+5], joueur);
-
-                            if (pasDePionAvant && pasDePionApres) {
-                                if (contientNouveauPion(tableau[i][j], tableau[i+1][j+1], tableau[i+2][j+2], tableau[i+3][j+3], tableau[i+4][j+4])) {
-                                    tableau[i][j] = Character.toLowerCase(tableau[i][j]);
-                                    tableau[i+1][j+1] = Character.toLowerCase(tableau[i+1][j+1]);
-                                    tableau[i+2][j+2] = Character.toLowerCase(tableau[i+2][j+2]);
-                                    tableau[i+3][j+3] = Character.toLowerCase(tableau[i+3][j+3]);
-                                    tableau[i+4][j+4] = Character.toLowerCase(tableau[i+4][j+4]);
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-
-                    // diag asc (/)
-                    if (i + 4 < taille && j - 4 >= 0) {
-                        if (estMemeJoueur(tableau[i+1][j-1], joueur) &&
-                                estMemeJoueur(tableau[i+2][j-2], joueur) &&
-                                estMemeJoueur(tableau[i+3][j-3], joueur) &&
-                                estMemeJoueur(tableau[i+4][j-4], joueur)) {
-
-                            boolean pasDePionAvant = (i == 0 || j == taille - 1) || !estMemeJoueur(tableau[i-1][j+1], joueur);
-                            boolean pasDePionApres = (i + 5 >= taille || j - 5 < 0) || !estMemeJoueur(tableau[i+5][j-5], joueur);
-
-                            if (pasDePionAvant && pasDePionApres) {
-                                if (contientNouveauPion(tableau[i][j], tableau[i+1][j-1], tableau[i+2][j-2], tableau[i+3][j-3], tableau[i+4][j-4])) {
-                                    tableau[i][j] = Character.toLowerCase(tableau[i][j]);
-                                    tableau[i+1][j-1] = Character.toLowerCase(tableau[i+1][j-1]);
-                                    tableau[i+2][j-2] = Character.toLowerCase(tableau[i+2][j-2]);
-                                    tableau[i+3][j-3] = Character.toLowerCase(tableau[i+3][j-3]);
-                                    tableau[i+4][j-4] = Character.toLowerCase(tableau[i+4][j-4]);
-                                    return true;
-                                }
-                            }
-                        }
+                    if (traiterVictoire(tab, startL, startC, dL, dC)) {
+                        return true;
                     }
                 }
             }

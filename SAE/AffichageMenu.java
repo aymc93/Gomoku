@@ -39,7 +39,7 @@ public class AffichageMenu {
             if (scanner.hasNextInt()) {
                 choix = scanner.nextInt();
             } else {
-                scanner.next(); // On vide le buffer si l'utilisateur tape des lettres
+                scanner.next(); // vide si mal ecrit
             }
         }
         return choix;

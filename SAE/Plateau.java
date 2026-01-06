@@ -8,9 +8,26 @@ public class Plateau {
     public static void AfficheTableau(char[][] tS) {
         String ligneSeparation = "+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+";
 
-        System.out.println(ligneSeparation);
+        System.out.print("    ");
+        for (int k = 1; k <= 19; k++) {
+            if (k < 10) {
+                System.out.print("  " + k + " ");
+            } else {
+                System.out.print(" " + k + " ");
+            }
+        }
+        System.out.println();
+
+        System.out.println("    " + ligneSeparation);
 
         for (int i = 0; i < tS.length; i++) {
+
+            if (i + 1 < 10) {
+                System.out.print(" " + (i + 1) + "  ");
+            } else {
+                System.out.print((i + 1) + "  ");
+            }
+
             for (int j = 0; j < tS[i].length; j++) {
 
                 char pion = tS[i][j];
@@ -37,7 +54,7 @@ public class Plateau {
                 System.out.print("| " + affichage + " ");
             }
             System.out.println("|");
-            System.out.println(ligneSeparation);
+            System.out.println("    " + ligneSeparation);
         }
     }
 

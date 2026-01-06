@@ -2,36 +2,44 @@ import java.util.Scanner;
 
 public class Player {
 
-    public static char[][] Demande(char[][] tableau, int player) {
+    // renvoie tableau de 2 entiers ligne puis colone
+    public static int[] Demande(char[][] tableau, int player) {
         Scanner scanner = new Scanner(System.in);
-        int ligne, colone;
-        boolean coupValide = false;
+        int l, c;
 
-        do {
-            System.out.print("Joueur " + player + ", entrez une ligne (1-19) : ");
-            ligne = scanner.nextInt();
+        while (true) {
+            System.out.println("Joueur " + player + ", a vous de jouer !");
 
-            System.out.print("\nJoueur " + player + ", entrez une colonne (1-19) : ");
-            colone = scanner.nextInt();
+            // saisie ligne
+            System.out.print("Entrez une ligne (1-19) : ");
+            if (scanner.hasNextInt()) {
+                l = scanner.nextInt() - 1;
+            } else {
+                scanner.next(); // vider
+                System.out.println("Erreur : Entrez un chiffre.");
+                continue;
+            }
 
-            int l = ligne - 1;
-            int c = colone - 1;
+            // saisie colonn
+            System.out.print("\nEntrez une colonne (1-19) : ");
+            if (scanner.hasNextInt()) {
+                c = scanner.nextInt() - 1;
+            } else {
+                scanner.next();
+                System.out.println("Erreur : Entrez un chiffre.");
+                continue;
+            }
 
+            // verif
             if (l >= 0 && l < 19 && c >= 0 && c < 19) {
                 if (tableau[l][c] != 'X' && tableau[l][c] != 'O') {
-                    coupValide = true;
-                    if (player == 1) {
-                        tableau[l][c] = 'X';
-                    } else {
-                        tableau[l][c] = 'O';
-                    }
+                    return new int[]{l, c};
                 } else {
-                    System.out.println("Il y a déjà un pion ici ! Réessayez");
+                    System.out.println("Il y a déjà un pion ici !");
                 }
             } else {
-                System.out.println("Hors du plateau (doit être entre 1 et 19)");
+                System.out.println("Hors du plateau (1-19)");
             }
-        } while (!coupValide);
-        return tableau;
+        }
     }
 }
